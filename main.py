@@ -5,6 +5,8 @@ The script requires the following environment variables:
 - USER_NAME: The user's name.
 - ID_VALUE: The ID value.
 - URL: The URL of the web page.
+- FORM_ELEMENT: The form element to be interacted with.
+- BUTTON_ID: The ID of the button to be clicked.
 
 These should be added to a .env file in the same directory as the script.
 
@@ -114,7 +116,6 @@ def main():
     #     # inner_text = driver.find_element(By.XPATH, "mf-msg__info").get_attribute(
     #     "innerText"
     # )
-
     # print(inner_text)
     time.sleep(15)
 
