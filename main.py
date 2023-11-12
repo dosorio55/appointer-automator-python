@@ -116,6 +116,7 @@ def main():
     # )
 
     # print(inner_text)
+    time.sleep(15)
 
     driver.quit()
 
@@ -123,4 +124,4 @@ def main():
 if __name__ == "__main__":
     while True:
         main()
-        time.sleep(600)
+        time.sleep(585)
