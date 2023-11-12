@@ -48,6 +48,8 @@ def signal_exit_handler(signum, frame):
     print("Exiting...")
     if APPOINTMENT_AVAILABLE:
         print("An appointment was found.")
+    else:
+        print("No appointment was found.")
     sys.exit(0)
 
 
@@ -61,7 +63,6 @@ def send_email():
     msg["Subject"] = "Appointment available! 🎉"
     msg["From"] = EMAIL_SENDER
     msg["To"] = EMAIL_SENDER
-    ## get time now
     now = datetime.now()
     msg.set_content(
         f"""An appointment was found at {now.strftime('%H:%M:%S')}!, 
@@ -77,11 +78,22 @@ def send_email():
 
 def main():
     """Main function."""
+    global APPOINTMENT_AVAILABLE
     driver = webdriver.Chrome()
+
     driver.get(URL)
 
-    driver.implicitly_wait(200)
+    driver.implicitly_wait(2)
+    request_exeded = driver.find_element(By.TAG_NAME, "h1")
 
+    if request_exeded is not None:
+        request_exeded = request_exeded.get_attribute("innerText")
+
+        if request_exeded == "Too Many Requests":
+            print("Request exceded.")
+            return
+
+    driver.implicitly_wait(10)
     driver.find_element(By.ID, "form").send_keys("Madrid")
 
     driver.find_element(By.ID, BTN_ACEPTAR).click()
@@ -108,16 +120,18 @@ def main():
     driver.find_element(By.ID, "txtDesCitado").send_keys(NAME)
 
     driver.find_element(By.ID, BTN_ENVIAR).click()
-    driver.find_element(By.ID, BTN_ENVIAR).click()
 
-    # inner_text = driver.find_element(
-    #     By.XPATH, '//p[@class="mf-msg__info"]/span'
-    # ).get_attribute(
-    #     # inner_text = driver.find_element(By.XPATH, "mf-msg__info").get_attribute(
-    #     "innerText"
-    # )
-    # print(inner_text)
-    time.sleep(15)
+    inner_text = driver.find_element(By.XPATH, '//p[@class="mf-msg__info"]/span')
+
+    if inner_text is not None:
+        inner_text = inner_text.get_attribute("innerText")
+
+        if inner_text != "Información: En este momento no hay citas disponibles":
+            print("Appointment available!")
+            APPOINTMENT_AVAILABLE = True
+            print(URL)
+            send_email()
+            time.sleep(15)
 
     driver.quit()
 
@@ -125,4 +139,5 @@ def main():
 if __name__ == "__main__":
     while True:
         main()
-        time.sleep(585)
+        print("Waiting 10 minutes...")
+        time.sleep(600)
